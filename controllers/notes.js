@@ -17,7 +17,6 @@ const getNote = async (req, res) => {
   try {
     const slug = req.params.slug;
     const note = await Note.findOne({slug}); // Slug is unique
-    const isFirst = req.query.first === 'true';
 
     // Note is not found
     if(!note)
@@ -35,10 +34,8 @@ const getNote = async (req, res) => {
       res.status(200).json({message: "This note has self destructed!"});
 
     // Note has not been accessed nor expired
-    if(!isFirst){
-      note.accessed = true;
-      await note.save();
-    }
+    note.accessed = true;
+    await note.save();
     res.status(200).json(note);
   } catch (error) {
     res.status(500).json({message: error.message});
