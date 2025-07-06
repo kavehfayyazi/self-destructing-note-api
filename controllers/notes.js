@@ -20,25 +20,26 @@ const getNote = async (req, res) => {
 
     // Note is not found
     if(!note)
-      res.status(404).json({message: "This note was not found."})
+      return res.status(404).json({message: "This note was not found."})
 
     // Note has been read already
     if(note.accessed)
-      res.status(200).json({message: "This note has already been accessed."});
+      return res.status(200).json({message: "This note has already been accessed."});
 
     // Note has expired
-    const noteCreatedAt = note.createdAt.getTime();
-    const currentTime = Date.now();
-    const timeDiff = currentTime - noteCreatedAt;
-    if(timeDiff > 6 * 60 * 60 * 1000) // If the time difference is greater than six hours
-      res.status(200).json({message: "This note has self destructed!"});
+    const createdAt = note.createdAt.getTime();
+    const age = Date.now() - createdAt;
+    const SIX_HOURS = 6 * 60 * 60 * 1000
+    if(age > SIX_HOURS)
+      return res.status(200).json({message: "This note has self destructed!"});
 
     // Note has not been accessed nor expired
     note.accessed = true;
     await note.save();
-    res.status(200).json(note);
+    
+    return res.status(200).json(note);
   } catch (error) {
-    res.status(500).json({message: error.message});
+    return res.status(500).json({message: error.message});
   }
 };
 
